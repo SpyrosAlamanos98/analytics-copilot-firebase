@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Circana KPIs Analysis</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+</head>
+
+<body>
+
+  <!-- ===================== AUTH PAGE ===================== -->
+  <div id="auth-page">
+    <h1>📊 Circana KPIs Analysis</h1>
+    <p class="hint">Upload reports, compare trends, and query your data.</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="login">🔑 Sign In</button>
+      <button class="tab-btn" data-tab="register">📝 Register</button>
+    </div>
+
+    <form id="login-form">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="user@circana.com" required />
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required />
+      </div>
+      <p class="error-msg hidden" id="login-error"></p>
+      <button type="submit">Sign In</button>
+    </form>
+
+    <form id="register-form" class="hidden">
+      <p class="hint">⚠️ Only @circana.com emails allowed.</p>
+      <div class="field">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. John Doe" required />
+      </div>
+      <div class="field">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" placeholder="user@circana.com" required />
+      </div>
+      <div class="field">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" required minlength="6" />
+      </div>
+      <div class="field">
+        <label for="reg-password2">Confirm Password</label>
+        <input type="password" id="reg-password2" required minlength="6" />
+      </div>
+      <p class="error-msg hidden" id="register-error"></p>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <!-- ===================== APP SHELL ===================== -->
+  <div id="app-shell" class="hidden">
+    <aside id="sidebar">
+      <div class="brand"><span class="mark">📊</span> Circana KPIs Analysis</div>
+
+      <div class="user-card">
+        <div class="name" id="sidebar-name"></div>
+        <div class="email" id="sidebar-email"></div>
+        <button class="secondary" id="logout-btn" style="margin-top:0.6em;width:100%;">🚪 Sign Out</button>
+      </div>
+
+      <div>
+        <h3>🤖 AI Chat</h3>
+        <div id="gemini-admin-block" class="hidden">
+          <label for="gemini-key-input">Google Gemini API Key (shared, team-wide)</label>
+          <input type="password" id="gemini-key-input" placeholder="optional" />
+          <p class="hint" style="margin-top:0.4em;">
+            Free key: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a>.
+            One key for the whole team — only admin can view/edit.
+          </p>
+          <button class="secondary" id="save-key-btn" style="width:100%;margin-top:0.4em;">💾 Save Key</button>
+        </div>
+        <p id="gemini-user-note" class="hint hidden"></p>
+      </div>
+
+      <div>
+        <h3>📂 Saved Reports</h3>
+        <ul class="file-list" id="sidebar-file-list"></ul>
+        <div class="storage-note" id="storage-note"></div>
+      </div>
+    </aside>
+
+    <main id="main">
+      <h1>📊 Circana KPIs Analysis</h1>
+      <p class="hint" id="welcome-line"></p>
+
+      <!-- Upload -->
+      <section class="section">
+        <h2>📁 Reports</h2>
+        <div class="upload-drop">
+          <input type="file" id="file-input" accept=".xlsx,.csv" multiple />
+          <div>Upload Excel (.xlsx) or CSV files</div>
+        </div>
+        <div id="upload-status" class="spinner-note hidden"></div>
+
+        <div id="file-select-block" class="hidden" style="margin-top:1.2em;">
+          <div class="file-select-bar">
+            <label class="file-select-label">Select reports for analysis</label>
+            <div class="file-actions">
+              <button type="button" class="secondary btn-sm" id="select-all-btn">Select All</button>
+              <button type="button" class="secondary btn-sm" id="deselect-all-btn">Deselect All</button>
+              <button type="button" class="danger btn-sm" id="delete-selected-btn">🗑️ Delete Selected</button>
+              <button type="button" class="danger btn-sm" id="delete-all-btn">🗑️ Delete All</button>
+            </div>
+          </div>
+          <div id="file-delete-status" class="spinner-note hidden" style="margin-bottom:0.6em;"></div>
+          <div id="file-checkboxes"></div>
+          <button id="analyze-btn" style="margin-top:0.8em;">🔍 Analyze</button>
+        </div>
+      </section>
+
+      <!-- QC -->
+      <section class="section hidden" id="qc-section">
+        <h2>🧪 Data Quality (QC)</h2>
+        <div id="qc-panels"></div>
+      </section>
+
+      <!-- KPI trend -->
+      <section class="section hidden" id="kpi-section">
+        <h2>📈 KPI Trend</h2>
+        <div class="field" style="max-width:320px;">
+          <label for="metric-select">Select KPI</label>
+          <select id="metric-select"></select>
+        </div>
+        <canvas id="trend-chart" height="90"></canvas>
+        <div class="metrics-row">
+          <div class="metric-block">
+            <div class="label">First Report</div>
+            <div class="value" id="metric-first">—</div>
+          </div>
+          <div class="metric-block">
+            <div class="label">Latest Report</div>
+            <div class="value" id="metric-latest">—</div>
+          </div>
+          <div class="metric-block">
+            <div class="label">Change %</div>
+            <div class="value" id="metric-change">—</div>
+          </div>
+        </div>
+        <p id="exec-line"></p>
+      </section>
+
+      <!-- Movers -->
+      <section class="section hidden" id="movers-section">
+        <h2>📊 Top Movers</h2>
+        <div class="movers-grid">
+          <div>
+            <h3>Top Growing</h3>
+            <ol id="movers-top"></ol>
+          </div>
+          <div>
+            <h3>Largest Declines</h3>
+            <ol id="movers-bottom"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Exec summary -->
+      <section class="section hidden" id="summary-section">
+        <h2>🤖 Auto Executive Summary</h2>
+        <div id="summary-locked" class="hint">
+          🔒 This feature requires a free Gemini API key (sidebar, left).
+        </div>
+        <button id="summary-btn" class="hidden">🎯 Generate Summary</button>
+        <div id="summary-output" style="margin-top:1em;white-space:pre-wrap;"></div>
+      </section>
+
+      <!-- Export -->
+      <section class="section hidden" id="export-section">
+        <h2>📥 PowerPoint Export</h2>
+        <p class="hint">Download a formal executive PowerPoint presentation (.pptx) containing QC evaluation, KPI trend chart, Top Movers, and Executive Summary.</p>
+        <button id="export-pptx-btn">📊 Export to PowerPoint (.pptx)</button>
+      </section>
+
+      <!-- Chat -->
+      <section class="section hidden" id="chat-section">
+        <h2>💬 Ask Your Data</h2>
+        <p class="hint" id="chat-mode-line"></p>
+        <div id="chat-log"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Ask anything about the report..." />
+          <button id="chat-send-btn">Send</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast-root"></div>
+
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,721 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Core palette — Circana brand */
+  --paper: #F5F1FB;
+  --paper-raised: #FBF9FE;
+  --ink: #1D1526;
+  --ink-soft: #6B5E78;
+  --line: #D9CCEC;
+  --accent: #BE89F9;
+  --accent-ink: #4E106F;
+  --good: #2F6E63;
+  --bad: #A6472E;
+  --warn: #C1862E;
+
+  /* New — card system */
+  --card: #FFFFFF;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.055);
+  --radius-card: 10px;
+  --radius-ui: 4px;
+  --info: #2E6DA6;
+
+  /* Typography */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+
+  /* Legacy alias */
+  --radius: var(--radius-ui);
+
+  --max-width: 940px;
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  margin: 0 0 0.4em 0;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 1.85rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+h3 {
+  font-size: 1rem;
+}
+
+a {
+  color: var(--accent-ink);
+}
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+button {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-ui);
+  border: 1px solid var(--accent-ink);
+  background: var(--accent-ink);
+  color: #fff;
+  padding: 0.55em 1.25em;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.01em;
+}
+
+button:hover {
+  opacity: 0.87;
+}
+
+button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+button.secondary:hover {
+  background: var(--paper);
+}
+
+button.danger {
+  background: transparent;
+  color: var(--bad);
+  border-color: var(--bad);
+  padding: 0.28em 0.65em;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+button.danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+button.btn-sm {
+  padding: 0.28em 0.65em;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.file-select-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  margin-bottom: 0.6em;
+}
+
+.file-select-label {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+}
+
+button.link {
+  background: none;
+  border: none;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 400;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  padding: 0.58em 0.8em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-ui);
+  background: var(--paper-raised);
+  color: var(--ink);
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(190, 137, 249, 0.18);
+  outline: none;
+}
+
+label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 0.3em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field {
+  margin-bottom: 1.1em;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+#app-shell {
+  display: grid;
+  grid-template-columns: 268px 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 800px) {
+  #app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  #sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    border-left: none;
+    border-top: 3px solid var(--accent);
+  }
+}
+
+/* ---------- Sidebar ---------- */
+#sidebar {
+  background: var(--paper-raised);
+  border-right: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  padding: 1.6rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.brand .mark {
+  color: var(--accent-ink);
+}
+
+.user-card {
+  font-size: 0.85rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 1em 0;
+}
+
+.user-card .name {
+  font-weight: 600;
+  margin-bottom: 0.1em;
+}
+
+.user-card .email {
+  color: var(--ink-soft);
+  font-size: 0.79rem;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.45em 0;
+  border-bottom: 1px dotted var(--line);
+  font-size: 0.82rem;
+}
+
+.storage-note {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-top: 0.5em;
+}
+
+/* Sidebar section labels */
+#sidebar h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin-bottom: 0.8em;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+#main {
+  padding: 2.5rem 2rem 5rem;
+  max-width: var(--max-width);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#main>h1 {
+  margin-bottom: 0;
+}
+
+#main>.hint {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   CARD — core tile
+   ============================================================ */
+.section {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  padding: 1.5rem 1.75rem;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+/* Card header divider */
+.section>h2:first-of-type {
+  padding-bottom: 0.8rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+/* ============================================================
+   STAT TILES
+   ============================================================ */
+.metrics-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0.25rem 0 1rem;
+}
+
+.metric-block {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.85em 1.1em;
+  min-width: 115px;
+  flex: 1 1 115px;
+}
+
+.metric-block .label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.3em;
+}
+
+.metric-block .value {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  line-height: 1.1;
+  font-weight: 500;
+}
+
+.metric-block .value.good {
+  color: var(--good);
+}
+
+.metric-block .value.bad {
+  color: var(--bad);
+}
+
+/* ============================================================
+   QC PANELS
+   ============================================================ */
+.qc-panel {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.qc-panel:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* QC score badge */
+.qc-score-badge {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Severity chips — inline colored pills */
+.severity-chip {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: 99px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+.severity-chip.critical {
+  background: rgba(166, 71, 46, 0.13);
+  color: var(--bad);
+}
+
+.severity-chip.warning {
+  background: rgba(193, 134, 46, 0.14);
+  color: #7a5216;
+}
+
+.severity-chip.info {
+  background: rgba(46, 109, 166, 0.12);
+  color: var(--info);
+}
+
+.severity-chip.ok {
+  background: rgba(47, 110, 99, 0.12);
+  color: var(--good);
+}
+
+/* QC table */
+table.qc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  margin-top: 0.75em;
+}
+
+table.qc-table thead th {
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid var(--line);
+  padding: 0.45em 0.75em;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+}
+
+table.qc-table tbody tr {
+  transition: background 0.1s;
+}
+
+table.qc-table tbody tr:hover {
+  background: var(--paper-raised);
+}
+
+table.qc-table td {
+  padding: 0.52em 0.75em;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+table.qc-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.qc-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow-count {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   TOP MOVERS
+   ============================================================ */
+.movers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .movers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.movers-grid>div {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+}
+
+.movers-grid h3 {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 0.7em;
+}
+
+.movers-grid ol {
+  padding-left: 1.1em;
+  margin: 0;
+}
+
+.movers-grid li {
+  padding: 0.28em 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dotted var(--line);
+}
+
+.movers-grid li:last-child {
+  border-bottom: none;
+}
+
+/* ============================================================
+   CHAT
+   ============================================================ */
+#chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0.25rem 0 0.75rem;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.chat-msg {
+  padding: 0.75em 1.05em;
+  border-radius: 14px;
+  max-width: 88%;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+  background: var(--accent-ink);
+  color: #fff;
+  border-bottom-right-radius: 3px;
+}
+
+.chat-msg.assistant {
+  align-self: flex-start;
+  background: #F8F7F3;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-bottom-left-radius: 3px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+}
+
+.chat-input-row input {
+  flex: 1;
+}
+
+/* ============================================================
+   AUTH PAGE
+   ============================================================ */
+#auth-page {
+  max-width: 420px;
+  margin: 5rem auto;
+  padding: 0 1.5rem;
+}
+
+#auth-page h1 {
+  margin-bottom: 0.2em;
+}
+
+.tab-row {
+  display: flex;
+  gap: 0.4rem;
+  margin: 1.5rem 0 1.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  padding: 0.6em 0.3em;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.error-msg {
+  color: var(--bad);
+  font-size: 0.84rem;
+  margin: 0.5em 0;
+}
+
+.hint {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   UPLOAD ZONE
+   ============================================================ */
+.upload-drop {
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  padding: 1.6em;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  background: var(--paper-raised);
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.upload-drop:hover {
+  border-color: var(--accent);
+  background: rgba(190, 137, 249, 0.06);
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+.spinner-note {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 0.5em;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--accent-ink);
+  color: #fff;
+  padding: 0.8em 1.2em;
+  border-radius: var(--radius-ui);
+  font-size: 0.84rem;
+  max-width: 340px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  z-index: 9999;
+  animation: toast-in 0.2s ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Executive summary output */
+#summary-output {
+  margin-top: 1em;
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}

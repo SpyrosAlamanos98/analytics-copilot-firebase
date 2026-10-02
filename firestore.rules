@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // This is the real domain enforcement in the Spark build: without a
+    // Cloud Functions blocking trigger, anyone can technically *create* an
+    // Auth account with any email — but every read/write in this app is
+    // gated on this check, so a non-circana.com account simply can't do
+    // anything with the app.
+    function isCircanaUser() {
+      return isSignedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.matches('.*@circana[.]com$');
+    }
+
+    // Only these people can change the team's shared Gemini key. Everyone
+    // else can still read it (so the AI chat works for them), just not
+    // edit it. Keep this list in sync with ADMIN_EMAILS in public/js/app.js.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email.lower() in [
+        'spyros.alamanos@circana.com'
+      ];
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // config/shared — one Gemini API key for the whole team. Everyone
+    // signed in can read it (AI chat works for all); only isAdmin() can
+    // write it, so regular users can't see or change the key.
+    match /config/{docId} {
+      allow read: if isCircanaUser();
+      allow write: if isCircanaUser() && isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid) && isCircanaUser();
+
+      // users/{uid}/reports/{reportId} — metadata for one uploaded report
+      match /reports/{reportId} {
+        allow read, write: if isOwner(uid) && isCircanaUser();
+
+        // users/{uid}/reports/{reportId}/chunks/{n} — the parsed row data,
+        // split into pieces so no single document risks the 1 MiB limit
+        match /chunks/{chunkId} {
+          allow read, write: if isOwner(uid) && isCircanaUser();
+        }
+      }
+    }
+  }
+}

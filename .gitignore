@@ -1,0 +1,20 @@
+﻿# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Node / dependencies
+node_modules/
+
+# Environment & credentials
+.env
+.env.local
+*.secret.json
+serviceAccountKey.json
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
